@@ -250,12 +250,12 @@ void SCPI_Parser::Execute(char* message, Stream &interface) {
     if (code == unknown_hash) {
       //Call ErrorHandler UnknownCommand
       last_error = ErrorCode::UnknownCommand;
-      (*callers_[max_commands])(commands, parameters, interface);
+      callers_[max_commands](commands, parameters, interface);
       continue;
     }
     for (uint8_t i = 0; i < codes_size_; i++)
       if (valid_codes_[i] == code) {
-        (*callers_[i])(commands, parameters, interface);
+        callers_[i](commands, parameters, interface);
         break;
       }  
   }
@@ -296,11 +296,11 @@ char* SCPI_Parser::GetMessage(Stream& interface, const char* term_chars) {
     if (message_length_ >= buffer_length){
       //Call ErrorHandler due BufferOverflow
       last_error = ErrorCode::BufferOverflow;
-      (*callers_[max_commands])(SCPI_C(), SCPI_P(), interface);
+      callers_[max_commands](SCPI_C(), SCPI_P(), interface);
       message_length_ = 0;
       return NULL;
     }
-    
+
     #if SCPI_MAX_SPECIAL_COMMANDS
     //For the first space only.
     if (strcspn(msg_buffer_, " ") == message_length_- 1){
@@ -308,9 +308,9 @@ char* SCPI_Parser::GetMessage(Stream& interface, const char* term_chars) {
       tree_code_ = 0;
       SCPI_Commands commands(msg_buffer_);
       scpi_hash_t code = this->GetCommandCode_(commands);
-      for (uint8_t i = 0; i < special_codes_size_; i++) 
+      for (uint8_t i = 0; i < special_codes_size_; i++)
         if (valid_special_codes_[i] == code) {
-          (*special_callers_[i])(commands, interface);
+          special_callers_[i](commands, interface);
           message_length_ = 0;
           return msg_buffer_;
         }
@@ -341,7 +341,7 @@ char* SCPI_Parser::GetMessage(Stream& interface, const char* term_chars) {
   if ((millis() - time_checker_) > timeout) {
       //Call ErrorHandler due Timeout
       last_error = ErrorCode::Timeout;
-      (*callers_[max_commands])(SCPI_C(), SCPI_P(), interface);
+      callers_[max_commands](SCPI_C(), SCPI_P(), interface);
       message_length_ = 0;
       return NULL;
   }
@@ -411,12 +411,12 @@ void SCPI_Parser::PrintDebugInfo(Stream& interface)
           hash_crash = true;
           break;
         }
-    interface.print(F("\t\t0x"));
-    interface.print(long(callers_[i]), HEX);
+    interface.print(F("\t\t"));
+    interface.print(callers_[i] ? F("set") : F("null"));
     interface.println();
     interface.flush();
   }
-  if (unknown_error) 
+  if (unknown_error)
     interface.println(F(" **ERROR** Tried to register ukwnonk tokens. (!*)"));
   if (invalid_error) 
     interface.println(F(" **ERROR** Tried to register invalid commands. (!%)"));
@@ -454,8 +454,8 @@ void SCPI_Parser::PrintDebugInfo(Stream& interface)
           hash_crash = true;
           break;
         }
-    interface.print(F("\t\t0x"));
-    interface.print(long(special_callers_[i]), HEX);
+    interface.print(F("\t\t"));
+    interface.print(special_callers_[i] ? F("set") : F("null"));
     interface.println();
     interface.flush();
   }
