@@ -68,10 +68,11 @@ SCPI_Commands::SCPI_Commands(char* message) {
    not_processed_message++;
   }
   // Split using ':'
-  token = strtok(token, ":");
+  char *save_ptr = NULL;
+  token = strtok_r(token, ":", &save_ptr);
   while (token != NULL) {
     this->Append(token);
-    token = strtok(NULL, ":");
+    token = strtok_r(NULL, ":", &save_ptr);
   }
 }
 
@@ -91,11 +92,12 @@ SCPI_Parameters::SCPI_Parameters(){}
 SCPI_Parameters::SCPI_Parameters(char* message) {
   char* parameter = message;
   // Split using ','
-  parameter = strtok(parameter, ",");
+  char *save_ptr = NULL;
+  parameter = strtok_r(parameter, ",", &save_ptr);
   while (parameter != NULL) {
     while(isspace(*parameter)) parameter++;
     this->Append(parameter);
-    parameter = strtok(NULL, ",");
+    parameter = strtok_r(NULL, ",", &save_ptr);
   }
   //TODO add support for strings parameters (do not split parameters inside "")
 }

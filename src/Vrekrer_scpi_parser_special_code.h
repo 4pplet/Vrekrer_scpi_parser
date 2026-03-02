@@ -40,9 +40,10 @@ void SCPI_Parser::RegisterSpecialCommand(char* command,
   ``my_instrument.RegisterSpecialCommand("GET:DATA", &getData);``  
  For lower RAM usage use the Flash strings version.
 */
-void SCPI_Parser::RegisterSpecialCommand(const char* command, 
+void SCPI_Parser::RegisterSpecialCommand(const char* command,
                                          SCPI_special_caller_t caller) {
-  strcpy(msg_buffer_, command);
+  strncpy(msg_buffer_, command, buffer_length - 1);
+  msg_buffer_[buffer_length - 1] = '\0';
   this->RegisterSpecialCommand(msg_buffer_, caller);
 }
 
@@ -52,9 +53,10 @@ void SCPI_Parser::RegisterSpecialCommand(const char* command,
  Example:  
   ``my_instrument.RegisterSpecialCommand("GET:DATA", &getData);``
 */
-void SCPI_Parser::RegisterSpecialCommand(const __FlashStringHelper* command, 
+void SCPI_Parser::RegisterSpecialCommand(const __FlashStringHelper* command,
                                          SCPI_special_caller_t caller) {
-  strcpy_P(msg_buffer_, (const char *) command);
+  strncpy_P(msg_buffer_, (const char *) command, buffer_length - 1);
+  msg_buffer_[buffer_length - 1] = '\0';
   this->RegisterSpecialCommand(msg_buffer_, caller);
 }
 

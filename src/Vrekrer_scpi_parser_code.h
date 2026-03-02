@@ -19,6 +19,12 @@ SCPI_Parser::SCPI_Parser(){
   callers_[max_commands] = &DefaultErrorHandler;
 }
 
+///Destructor — frees dynamically allocated token strings.
+SCPI_Parser::~SCPI_Parser(){
+  for (uint16_t i = 0; i < tokens_size_; i++)
+    delete[] tokens_[i];
+}
+
 ///Add a token to the tokens' storage
 void SCPI_Parser::AddToken_(char *token) {
   if (tokens_size_ >= max_tokens) {
@@ -144,7 +150,8 @@ void SCPI_Parser::SetCommandTreeBase(char* tree_base) {
  For lower RAM usage use the Flash strings version.
 */
 void SCPI_Parser::SetCommandTreeBase(const char* tree_base) {
-  strcpy(msg_buffer_, tree_base);
+  strncpy(msg_buffer_, tree_base, buffer_length - 1);
+  msg_buffer_[buffer_length - 1] = '\0';
   this->SetCommandTreeBase(msg_buffer_);
 }
 
@@ -155,7 +162,8 @@ void SCPI_Parser::SetCommandTreeBase(const char* tree_base) {
   ``my_instrument.SetCommandTreeBase(F("SYSTem:LED"));``
 */
 void SCPI_Parser::SetCommandTreeBase(const __FlashStringHelper* tree_base) {
-  strcpy_P(msg_buffer_, (const char *) tree_base);
+  strncpy_P(msg_buffer_, (const char *) tree_base, buffer_length - 1);
+  msg_buffer_[buffer_length - 1] = '\0';
   this->SetCommandTreeBase(msg_buffer_);
 }
 
@@ -195,7 +203,8 @@ void SCPI_Parser::RegisterCommand(char* command, SCPI_caller_t caller) {
  For lower RAM usage use the Flash strings version.
 */
 void SCPI_Parser::RegisterCommand(const char* command, SCPI_caller_t caller) {
-  strcpy(msg_buffer_, command);
+  strncpy(msg_buffer_, command, buffer_length - 1);
+  msg_buffer_[buffer_length - 1] = '\0';
   this->RegisterCommand(msg_buffer_, caller);
 }
 
@@ -205,9 +214,10 @@ void SCPI_Parser::RegisterCommand(const char* command, SCPI_caller_t caller) {
  Example:  
   ``my_instrument.RegisterCommand(F("*IDN?"), &Identify);``
 */
-void SCPI_Parser::RegisterCommand(const __FlashStringHelper* command, 
+void SCPI_Parser::RegisterCommand(const __FlashStringHelper* command,
                                   SCPI_caller_t caller) {
-  strcpy_P(msg_buffer_, (const char *) command);
+  strncpy_P(msg_buffer_, (const char *) command, buffer_length - 1);
+  msg_buffer_[buffer_length - 1] = '\0';
   this->RegisterCommand(msg_buffer_, caller);
 }
 

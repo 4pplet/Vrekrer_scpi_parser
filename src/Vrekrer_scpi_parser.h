@@ -119,6 +119,8 @@ class SCPI_Parser {
  public:
   //Constructor
   SCPI_Parser();
+  //Destructor — frees dynamically allocated tokens
+  ~SCPI_Parser();
   //Change the TreeBase for the next RegisterCommand calls
   void SetCommandTreeBase(char* tree_base);
   //SetCommandTreeBase version with RAM string support
