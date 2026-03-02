@@ -28,7 +28,7 @@ void SCPI_Parser::AddToken_(char *token) {
   size_t token_size = strlen(token);
   //Remove query symbols
   if (token[token_size - 1] == '?') token_size--;
-  for (uint8_t i = 0; i < tokens_size_; i++)
+  for (uint16_t i = 0; i < tokens_size_; i++)
     //Check if the token is allready added
     if ( (strncmp(token, tokens_[i], token_size) == 0) 
           and (token_size == strlen(tokens_[i])) ) return;
@@ -55,7 +55,7 @@ scpi_hash_t SCPI_Parser::GetCommandCode_(SCPI_Commands& commands) {
   code = (tree_code_ == 0) ? hash_magic_offset : tree_code_;
   if (commands.Size()==0) return unknown_hash;
   //Loop all keywords in the command
-  for (uint8_t i = 0; i < commands.Size(); i++) {
+  for (uint16_t i = 0; i < commands.Size(); i++) {
     //Get keywords's length
     size_t header_length = strlen(commands[i]);
     //For the last keyword remove the query symbol if needed
@@ -66,7 +66,7 @@ scpi_hash_t SCPI_Parser::GetCommandCode_(SCPI_Commands& commands) {
     }
 
     //Loop over all the known tokens
-    for (uint8_t j = 0; j < tokens_size_; j++) {
+    for (uint16_t j = 0; j < tokens_size_; j++) {
       //Get the token's short and long lengths
       size_t short_length = 0;
       while (isupper(tokens_[j][short_length])) short_length++;
@@ -83,11 +83,11 @@ scpi_hash_t SCPI_Parser::GetCommandCode_(SCPI_Commands& commands) {
       //Test if the keyword match with the token
       //otherwise test next token
       if (header_length == short_length) {
-        for (uint8_t k  = 0; k < short_length; k++)
+        for (uint16_t k  = 0; k < short_length; k++)
           if (not (toupper(commands[i][k]) == tokens_[j][k]))
             goto no_header_token_match;
       } else if (header_length == long_length) {
-        for (uint8_t k  = 0; k < long_length; k++)
+        for (uint16_t k  = 0; k < long_length; k++)
           if (not (toupper(commands[i][k]) == toupper(tokens_[j][k])))
             goto no_header_token_match;
       } else {
@@ -125,7 +125,7 @@ void SCPI_Parser::SetCommandTreeBase(char* tree_base) {
     tree_length_ = 0;
     return;
   }
-  for (uint8_t i = 0; i < tree_tokens.Size(); i++)
+  for (uint16_t i = 0; i < tree_tokens.Size(); i++)
     AddToken_(tree_tokens[i]);
   tree_code_ = 0;
   tree_code_ = this->GetCommandCode_(tree_tokens);
@@ -170,7 +170,7 @@ void SCPI_Parser::RegisterCommand(char* command, SCPI_caller_t caller) {
     return;
   }
   SCPI_Commands command_tokens(command);
-  for (uint8_t i = 0; i < command_tokens.Size(); i++)
+  for (uint16_t i = 0; i < command_tokens.Size(); i++)
     this->AddToken_(command_tokens[i]);
   scpi_hash_t code = this->GetCommandCode_(command_tokens);
   
@@ -253,7 +253,7 @@ void SCPI_Parser::Execute(char* message, Stream &interface) {
       callers_[max_commands](commands, parameters, interface);
       continue;
     }
-    for (uint8_t i = 0; i < codes_size_; i++)
+    for (uint16_t i = 0; i < codes_size_; i++)
       if (valid_codes_[i] == code) {
         callers_[i](commands, parameters, interface);
         break;
@@ -308,7 +308,7 @@ char* SCPI_Parser::GetMessage(Stream& interface, const char* term_chars) {
       tree_code_ = 0;
       SCPI_Commands commands(msg_buffer_);
       scpi_hash_t code = this->GetCommandCode_(commands);
-      for (uint8_t i = 0; i < special_codes_size_; i++)
+      for (uint16_t i = 0; i < special_codes_size_; i++)
         if (valid_special_codes_[i] == code) {
           special_callers_[i](commands, interface);
           message_length_ = 0;
@@ -316,7 +316,7 @@ char* SCPI_Parser::GetMessage(Stream& interface, const char* term_chars) {
         }
       //restore original message.
       msg_buffer_[message_length_ - 1] = ' ';
-      for (uint8_t i = 0; i < commands.Size()-1; i++)
+      for (uint16_t i = 0; i < commands.Size()-1; i++)
         commands[i][strlen(commands[i])] = ':';
       commands.not_processed_message--;
       commands.not_processed_message[0] = ' ';
@@ -373,7 +373,7 @@ void SCPI_Parser::PrintDebugInfo(Stream& interface)
   interface.println(F(" (SCPI_MAX_TOKENS)"));
   if (setup_errors.token_overflow) 
     interface.println(F(" **ERROR** Max tokens exceeded."));
-  for (uint8_t i = 0; i < tokens_size_; i++) {
+  for (uint16_t i = 0; i < tokens_size_; i++) {
     interface.print(F("  "));
     interface.print(i+1);
     interface.print(F(":\t"));
@@ -393,7 +393,7 @@ void SCPI_Parser::PrintDebugInfo(Stream& interface)
   if (setup_errors.command_overflow) 
     interface.println(F(" **ERROR** Max commands exceeded."));
   interface.println(F("  #\tHash\t\tHandler"));
-  for (uint8_t i = 0; i < codes_size_; i++) {
+  for (uint16_t i = 0; i < codes_size_; i++) {
     interface.print(F("  "));
     interface.print(i+1);
     interface.print(F(":\t"));
@@ -405,7 +405,7 @@ void SCPI_Parser::PrintDebugInfo(Stream& interface)
       interface.print(F("!%"));
       invalid_error = true;
     } else 
-      for (uint8_t j = 0; j < i; j++) 
+      for (uint16_t j = 0; j < i; j++) 
         if (valid_codes_[i] == valid_codes_[j]) {
           interface.print("!!");
           hash_crash = true;
@@ -436,7 +436,7 @@ void SCPI_Parser::PrintDebugInfo(Stream& interface)
   if (setup_errors.special_command_overflow) 
     interface.println(F(" **ERROR** Max special commands exceeded."));
   interface.println(F("  #\tHash\t\tHandler"));
-  for (uint8_t i = 0; i < special_codes_size_; i++) {
+  for (uint16_t i = 0; i < special_codes_size_; i++) {
     interface.print(F("  "));
     interface.print(i+1);
     interface.print(F(":\t"));
@@ -448,7 +448,7 @@ void SCPI_Parser::PrintDebugInfo(Stream& interface)
       interface.print(F("!%"));
       invalid_error = true;
     } else
-      for (uint8_t j = 0; j < i; j++)
+      for (uint16_t j = 0; j < i; j++)
         if (valid_special_codes_[i] == valid_special_codes_[j]) {
           interface.print("!!");
           hash_crash = true;

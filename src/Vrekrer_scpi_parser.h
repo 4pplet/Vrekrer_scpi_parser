@@ -57,7 +57,7 @@ Header file.
 */
 class SCPI_String_Array {
  public:
-  char* operator[](const byte index) const;  //Add indexing capability
+  char* operator[](const uint16_t index) const;  //Add indexing capability
   void Append(char* value);            //Append new string (LIFO stack Push)
   char* Pop();                         //LIFO stack Pop
   char* First() const;                       //Returns the first element of the array
@@ -175,11 +175,11 @@ class SCPI_Parser {
 
  protected:
   //Length of the message buffer.
-  const uint8_t buffer_length = SCPI_BUFFER_LENGTH;
+  const uint16_t buffer_length = SCPI_BUFFER_LENGTH;
   //Max number of valid tokens.
-  const uint8_t max_tokens = SCPI_MAX_TOKENS;
+  const uint16_t max_tokens = SCPI_MAX_TOKENS;
   //Max number of registered commands.
-  const uint8_t max_commands = SCPI_MAX_COMMANDS;
+  const uint16_t max_commands = SCPI_MAX_COMMANDS;
   //Internal errors container
   struct internal_errors {
     //Command storage overflow error
@@ -201,11 +201,11 @@ class SCPI_Parser {
   //Get a hash from a command
   scpi_hash_t GetCommandCode_(SCPI_Commands& commands);
   //Number of stored tokens
-  uint8_t tokens_size_ = 0;
+  uint16_t tokens_size_ = 0;
   //Storage for tokens
   char *tokens_[SCPI_MAX_TOKENS];
   //Number of registered commands
-  uint8_t codes_size_ = 0;
+  uint16_t codes_size_ = 0;
   //Registered commands' hash storage
   scpi_hash_t valid_codes_[SCPI_MAX_COMMANDS];
   //Pointers to the functions to be called when a valid command is received
@@ -223,9 +223,9 @@ class SCPI_Parser {
 
   #if SCPI_MAX_SPECIAL_COMMANDS
   //Max number of registered special commands.
-  const uint8_t max_special_commands = SCPI_MAX_SPECIAL_COMMANDS;
+  const uint16_t max_special_commands = SCPI_MAX_SPECIAL_COMMANDS;
   //Number of registered special commands
-  uint8_t special_codes_size_ = 0;
+  uint16_t special_codes_size_ = 0;
   //Registered special commands' hash storage
   scpi_hash_t valid_special_codes_[SCPI_MAX_SPECIAL_COMMANDS];
   //Pointers to the functions to be called when a special command is received

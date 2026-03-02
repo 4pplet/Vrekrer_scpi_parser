@@ -16,7 +16,7 @@ void SCPI_Parser::RegisterSpecialCommand(char* command,
     return;
   }
   SCPI_Commands command_tokens(command);
-  for (uint8_t i = 0; i < command_tokens.Size(); i++)
+  for (uint16_t i = 0; i < command_tokens.Size(); i++)
     this->AddToken_(command_tokens[i]);
   scpi_hash_t code = this->GetCommandCode_(command_tokens);
   

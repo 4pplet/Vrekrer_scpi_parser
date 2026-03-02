@@ -5,7 +5,7 @@
 // ## SCPI_String_Array member functions ##
 
 ///Add indexing capability.
-char* SCPI_String_Array::operator[](const uint8_t index) const {
+char* SCPI_String_Array::operator[](const uint16_t index) const {
   if (index >= size_) return NULL; //Invalid index
   return values_[index];
 }
